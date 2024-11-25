@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - DiVa Library</title>
+    <h1>Diva Library</h1>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<h1>Register</h1>
+<form id="registerForm" class="container">
+    <p>Please fill in this form to create an account.</p>
+    <hr>
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+
+    <label for="password-repeat">Repeat Password:</label>
+    <input type="password" id="password-repeat" name="password-repeat" required>
+    <hr>
+
+    <p>By creating an account you agree to our <a href="/terms-and-conditions">Terms & Privacy</a>.</p>
+    <button type="button" onclick="submitForm()">Submit</button>
+</form>
+
+<script>
+    async function submitForm() {
+
+        const name = document.getElementById('name').value;
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const passwordRepeat = document.getElementById('password-repeat').value;
+
+        if (password !== passwordRepeat) {
+            alert("Passwords do not match.");
+            return;
+        }
+        const userDto = { name, username, email, password };
+
+        try {
+            const registerResponse = await fetch('/api/users/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userDto)
+            });
+
+            if (registerResponse.ok) {
+                console.log('User registration successful!');
+                window.location.href = '/profile';
+            } else {
+                const errorData = await registerResponse.json();
+                alert(`Error registering: ${errorData.message}`);
+            }
+
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('An error occurred while submitting the form.');
+        }
+    }
+</script>
+</body>
+</html>

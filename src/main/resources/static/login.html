@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - DiVa Library</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<h1>Login with DiVa account</h1>
+
+<div class="container">
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <button onclick="login()">Login</button>
+</div>
+
+<script>
+    async function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const response = await fetch('/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (response.ok) {
+            window.location.href = "/api/users/profile";
+        } else {
+            alert('Login failed. Please check your credentials.');
+        }
+    }
+</script>
+</body>
+</html>

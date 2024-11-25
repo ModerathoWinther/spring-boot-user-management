@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - DiVa Library</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Welcome to Your Profile</h1>
+
+    <!-- User Details Section -->
+    <div class="card">
+        <h2 class="title">Your Details</h2>
+        <p><strong>Name:</strong> <span id="name"></span></p>
+        <p><strong>Email:</strong> <span id="email"></span></p>
+    </div>
+
+    <!-- Loaned Books Section -->
+    <div class="card">
+        <h2 class="title">Your Loaned Books</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Loan Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody id="loanedBooks">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Outstanding Fees Section -->
+    <div class="card">
+        <h2 class="title">Outstanding Fees</h2>
+        <p>Total Fees: <strong id="totalFees"></strong></p>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="button-container">
+        <a href="/" class="btn">Home</a>
+        <form action="/logout" method="post">
+            <button type="submit" class="btn">Logout</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Try fetching OAuth2 profile data first
+        fetchProfileData('/api/users/profile')
+            .catch(() => {
+                // Fallback to local user profile if OAuth2 profile fetch fails
+                return fetchProfileData('/api/users/local/profile');
+            })
+            .catch(error => console.error("Error fetching local profile from:", error));
+
+        // Function to fetch and populate profile data
+        function fetchProfileData(url) {
+            return fetch(url)
+                .then(response => {
+                    if (response.ok) return response.json();
+                    throw new Error(`Failed to fetch from ${url}`);
+                })
+                .then(data => {
+                    // Populate the user details
+                    document.getElementById('name').innerText = data.name;
+                    document.getElementById('email').innerText = data.email;
+                    document.getElementById('totalFees').innerText = `$${data.totalFees}`;
+
+                    // Populate the loaned books table
+                    const loanedBooksTable = document.getElementById('loanedBooks');
+                    loanedBooksTable.innerHTML = ""; // Clear previous entries
+                    data.loanedBooks.forEach(book => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${book.title}</td>
+                            <td>${book.loanDate}</td>
+                            <td>${book.dueDate}</td>
+                            <td style="${book.overdue ? 'color: red;' : ''}">${book.status}</td>
+                        `;
+                        loanedBooksTable.appendChild(row);
+                    });
+                });
+        }
+    });
+</script>
+</body>
+</html>
